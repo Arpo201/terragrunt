@@ -1,0 +1,78 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+hostname: Ubuntu
+ssh_authorized_keys: [
+  %{ for key in ssh_keys ~}
+  "${key}",
+  %{ endfor ~}
+  ]
+
+users:
+  - default
+  - name: project_a
+    # mkpasswd --method=SHA-512 --rounds=4096 (run on Ubuntu)
+    passwd: "$6$rounds=4096$wB8Tu/eD2FSDtrCf$W71TvNvaaTtp./XDSIAEM2qlEO4yYfOT4dMrVMrvxCOY0/XHEffbQvTNvCr/Pg4.sdLvoJB01l/fxi2NoO5Fk0"
+    ssh-authorized-keys: [
+      %{ for key in ssh_keys ~}
+      "${key}",
+      %{ endfor ~}
+    ]
+
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+    shell: /bin/bash
+
+write_files:
+  - content: |
+      network:
+        version: 2
+        ethernets:
+          ens192:
+            dhcp4: false
+            addresses:
+              - ${ip}
+            gateway4: ${gateway_ip}
+            nameservers:
+              addresses:
+                - 8.8.8.8
+                - 1.1.1.1
+    path: /etc/netplan/50-cloud-init.yaml
+  - content: |
+      version: "2.1"
+      services:
+        # https://hub.docker.com/r/itsthenetwork/nfs-server-alpine
+        nfs:
+          image: itsthenetwork/nfs-server-alpine:12
+          container_name: nfs
+          restart: always
+          privileged: true
+          environment:
+            - SHARED_DIRECTORY=/data
+          volumes:
+            - /data/nfs-storage:/data
+          ports:
+            - 2049:2049
+    owner: project_a:project_a
+    path: /home/project_a/nfs/docker-compose.yaml
+    permissions: '0755'
+
+runcmd:
+  - netplan apply
+
+  - sudo apt-get -y install ca-certificates curl gnupg lsb-release
+  - sudo mkdir -p /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  - sudo apt-get update
+  - sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  
+  - sudo groupadd docker
+  - sudo usermod -aG docker project_a
+  - sudo newgrp docker
+
+  - docker compose -f /home/project_a/nfs/docker-compose.yaml up -d
+
+  - touch /etc/user-data-finished.txt
+
+ 

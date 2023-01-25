@@ -1,0 +1,82 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+hostname: Ubuntu
+ssh_authorized_keys: [
+  %{ for key in ssh_keys ~}
+  "${key}",
+  %{ endfor ~}
+  ]
+
+users:
+  - default
+  - name: project_a
+    # mkpasswd --method=SHA-512 --rounds=4096 (run on Ubuntu)
+    passwd: $6$rounds=4096$IAVHEDXCV$msvqFZRiuFp5uKmf2vNVPxwwkeP4LoffpdJDe34K0yoDaUel5KF11gjYJfKHJo63PGE8U6zSC6c4XiRKd4ZjL1
+    ssh-authorized-keys: [
+      %{ for key in ssh_keys ~}
+      "${key}",
+      %{ endfor ~}
+    ]
+
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+    shell: /bin/bash
+
+write_files:
+  - content: |
+      network:
+        version: 2
+        ethernets:
+          ens192:
+            dhcp4: false
+            addresses:
+              - ${ip}
+            gateway4: ${gateway_ip}
+            nameservers:
+              addresses:
+                - 8.8.8.8
+                - 1.1.1.1
+    path: /etc/netplan/50-cloud-init.yaml
+  - content: |
+      load_module /usr/lib/nginx/modules/ngx_stream_module.so;
+      events { worker_connections 1024; }
+
+      stream {
+        upstream kubernetes {
+          #least_conn;
+          %{ for ip in target_ips ~}
+          server ${ip}:6443;
+          %{ endfor ~}
+
+        }
+
+        server {
+          listen 6443;
+          proxy_pass kubernetes;
+        }
+      }
+
+      http {
+        server {
+          listen 8081;
+          location = /health {
+              access_log off;
+              add_header 'Content-Type' 'application/json';
+              return 200 '{"status":"UP"}';
+          }
+        }
+      }
+      
+    path: /etc/nginx/nginx.conf
+
+# packages:
+#   - nginx
+
+runcmd:
+ - [ netplan, apply ]
+ - [ mkdir, -p, /etc/nginx/ssl ]
+ - [ openssl, req, -newkey, rsa:2048, -nodes, -keyout, /etc/nginx/ssl/server.key, -x509, -days, 365, -subj, "/C=TH/ST=BKK/O=KMITL/OU=IT", -out, /etc/nginx/ssl/server.crt ]
+ - [ apt, -y, install, nginx ]
+ - [ service, nginx, start ]
+ - [ touch, /etc/user-data-finished.txt ]

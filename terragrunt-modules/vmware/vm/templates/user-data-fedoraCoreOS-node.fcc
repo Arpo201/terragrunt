@@ -1,0 +1,76 @@
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+  - name: project_a
+    groups: [ sudo ]
+    # mkpasswd --method=SHA-512 --rounds=4096 (run on Ubuntu)
+    password_hash: "$6$rounds=4096$IAVHEDXCV$msvqFZRiuFp5uKmf2vNVPxwwkeP4LoffpdJDe34K0yoDaUel5KF11gjYJfKHJo63PGE8U6zSC6c4XiRKd4ZjL1"
+    ssh_authorized_keys: [
+      %{ for key in ssh_keys ~}
+      "${key}",
+      %{ endfor ~}
+    ]
+
+systemd:
+  units:
+    - name: install-firstboot-rpms.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install first boot packages
+        ConditionFirstBoot=yes
+        Wants=network-online.target
+        After=network-online.target
+        After=multi-user.target
+        [Service]
+        Type=oneshot
+        ExecStart=rpm-ostree install python grubby open-vm-tools libselinux-python3 --reboot
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /etc/ssh/sshd_config.d/20-enable-passwords.conf
+      mode: 0644
+      contents:
+        inline: |
+          PasswordAuthentication yes
+    - path: /etc/profile.d/systemd-pager.sh
+      mode: 0644
+      contents:
+        inline: |
+          # Tell systemd to not use a pager when printing information
+          export SYSTEMD_PAGER=cat
+    - path: /etc/sysctl.d/20-silence-audit.conf
+      mode: 0644
+      contents:
+        inline: |
+          # Raise console message logging level from DEBUG (7) to WARNING (4)
+          # to hide audit messages from the interactive console
+          kernel.printk=4
+    - path: /etc/sysctl.d/reverse-path-filter.conf
+      overwrite: true
+      mode: 0600
+      contents:
+        inline: |
+          net.ipv4.conf.all.rp_filter=1
+    - path: /etc/NetworkManager/system-connections/ens192.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          id=ens192
+          type=ethernet
+          interface-name=ens192
+          [ipv4]
+          address1=${ip}/${subnet},${gateway_ip}
+          dns=${dns}
+          dns-search=
+          may-fail=false
+          method=manual
+    - path: /etc/user-data-finished.txt
+      overwrite: true
+      mode: 0600
+      contents:
+        inline: |
+          Apply finished!!!!
