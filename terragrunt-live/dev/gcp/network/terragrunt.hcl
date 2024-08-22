@@ -1,5 +1,6 @@
 terraform {
-  source = "${get_path_to_repo_root()}/terragrunt-modules/${include.root.locals.provider_info.cloud_provider}/network"
+  // Output example : source = "/Users/test/terragrunt/terragrunt-modules/local/test-variables"
+  source = "${replace(replace(get_terragrunt_dir(), "terragrunt-live", "terragrunt-modules"), "${include.root.locals.environment}", "")}"
 }
 
 include "root" {
