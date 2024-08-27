@@ -4,5 +4,5 @@ include "root" {
 }
 
 locals {
-  modified_env = include.root.locals.environment
+  modified_env = include.root.locals.env_vars.environment
 }

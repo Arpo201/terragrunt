@@ -1,6 +1,6 @@
 terraform {
   // Output example : source = "/Users/test/terragrunt/terragrunt-modules/local/test-variables"
-  source = "${replace(replace(get_terragrunt_dir(), "terragrunt-live", "terragrunt-modules"), "${include.root.locals.environment}", "")}"
+  source = "${replace(replace(get_terragrunt_dir(), "terragrunt-live", "terragrunt-modules"), "${include.root.locals.env_vars.environment}", "")}"
 }
 
 include "root" {
