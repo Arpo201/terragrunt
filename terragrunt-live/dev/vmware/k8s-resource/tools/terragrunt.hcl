@@ -14,8 +14,8 @@ dependency "datastore" {
   config_path = "../datastore"
 
   mock_outputs = {
-    datastore_a_output             = "fake_datastore_a_output"
-    datastore_b_output             = "fake_datastore_b_output"
+    datastore_a_output = "fake_datastore_a_output"
+    datastore_b_output = "fake_datastore_b_output"
   }
 }
 

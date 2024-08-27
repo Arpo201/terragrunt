@@ -12,7 +12,7 @@ locals {
 }
 
 inputs = {
-  namespace                = local.namespace
+  namespace = local.namespace
 }
 
 # retryable_errors = ["Error:"]

@@ -25,9 +25,9 @@ inputs = {
   }
 
   vm_template_uuid = {
-    node = "74ed2c8c-6c54-41ed-abec-943f9f75811d"
-    lb   = "a9f7aa4d-cc7e-4a57-99c3-112cd88815cd"
-    storage   = "a9f7aa4d-cc7e-4a57-99c3-112cd88815cd"
+    node    = "74ed2c8c-6c54-41ed-abec-943f9f75811d"
+    lb      = "a9f7aa4d-cc7e-4a57-99c3-112cd88815cd"
+    storage = "a9f7aa4d-cc7e-4a57-99c3-112cd88815cd"
   }
 
   master_node = {
@@ -35,12 +35,12 @@ inputs = {
     num        = 3
     cpus       = 4
     memory     = 4096 # MB
-    disk_size  = 50 # GB
+    disk_size  = 50   # GB
     ip         = ["10.33.81.1", "10.33.81.2", "10.33.81.3"]
     subnetmask = "16"
     gateway_ip = "10.33.255.254"
     dns        = "8.8.8.8"
-    ssh_keys = local.ssh_keys
+    ssh_keys   = local.ssh_keys
   }
 
   worker_node = {
@@ -48,12 +48,12 @@ inputs = {
     num        = 3
     cpus       = 8
     memory     = 4096 # MB
-    disk_size  = 100 # GB
+    disk_size  = 100  # GB
     ip         = ["10.33.82.1", "10.33.82.2", "10.33.82.3"]
     subnetmask = "16"
     gateway_ip = "10.33.255.254"
     dns        = "8.8.8.8"
-    ssh_keys = local.ssh_keys
+    ssh_keys   = local.ssh_keys
   }
 
   master_lb = {
@@ -61,12 +61,12 @@ inputs = {
     num        = 1
     cpus       = 2
     memory     = 4096 # MB
-    disk_size  = 20 # GB
+    disk_size  = 20   # GB
     ip         = ["10.33.83.1"]
     subnetmask = "16"
     gateway_ip = "10.33.255.254"
     dns        = "8.8.8.8"
-    ssh_keys = local.ssh_keys
+    ssh_keys   = local.ssh_keys
   }
 
   worker_lb = {
@@ -74,12 +74,12 @@ inputs = {
     num        = 1
     cpus       = 4
     memory     = 4096 # MB
-    disk_size  = 20 # GB
+    disk_size  = 20   # GB
     ip         = ["10.33.83.2"]
     subnetmask = "16"
     gateway_ip = "10.33.255.254"
     dns        = "8.8.8.8"
-    ssh_keys = local.ssh_keys
+    ssh_keys   = local.ssh_keys
   }
 
   storage_vm = {
@@ -87,12 +87,12 @@ inputs = {
     num        = 1
     cpus       = 4
     memory     = 4096 # MB
-    disk_size  = 200 # GB
+    disk_size  = 200  # GB
     ip         = ["10.33.83.11"]
     subnetmask = "16"
     gateway_ip = "10.33.255.254"
     dns        = "8.8.8.8"
-    ssh_keys = local.ssh_keys
+    ssh_keys   = local.ssh_keys
   }
 
 }

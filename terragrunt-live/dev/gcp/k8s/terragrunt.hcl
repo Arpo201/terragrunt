@@ -18,17 +18,17 @@ include "network_dependency" {
 }
 
 inputs = {
-  service_account   = "terraform@project.iam.gserviceaccount.com"
-  cluster_name      = "${include.root.locals.name_prefix}-project-cluster"
-  k8s_version       = "1.24.8-gke.401"
-  pool_name         = "a-node-pool"
-  pool_machine_type = "e2-standard-2"
-  pool_disk_type    = "pd-standard"
-  pool_disk_size_gb = 50
-  pool_image_type   = "COS_CONTAINERD"
-  pool_min_node     = 2
-  pool_max_node     = 3
-  pool_init_node    = 2
+  service_account            = "terraform@project.iam.gserviceaccount.com"
+  cluster_name               = "${include.root.locals.name_prefix}-project-cluster"
+  k8s_version                = "1.24.8-gke.401"
+  pool_name                  = "a-node-pool"
+  pool_machine_type          = "e2-standard-2"
+  pool_disk_type             = "pd-standard"
+  pool_disk_size_gb          = 50
+  pool_image_type            = "COS_CONTAINERD"
+  pool_min_node              = 2
+  pool_max_node              = 3
+  pool_init_node             = 2
   http_load_balancing        = false
   network_policy             = false
   horizontal_pod_autoscaling = true
