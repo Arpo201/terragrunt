@@ -2,7 +2,7 @@
 
 This project uses [Terragrunt](https://terragrunt.gruntwork.io/) to manage the infrastructure when have multi-environments.
 
-Terraform v1.3.2, Terragrunt v0.38.12
+Terraform v1.10.2, Terragrunt v0.69.12
 
 ## Prerequisites
 
